@@ -9,10 +9,36 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
 from django.db import models
+from django.utils.html import format_html
 from django.utils.translation import ugettext as _
+from django.contrib.admin.templatetags.admin_static import static
 
 
-class DateRangeForm(forms.Form):
+
+
+class DateRangeFilterBaseForm(forms.Form):
+    def __init__(self, request, *args, **kwargs):
+        super(DateRangeFilterBaseForm, self).__init__(*args, **kwargs)
+        self.request = request
+
+    @property
+    def media(self):
+        try:
+            if getattr(self.request, 'daterange_filter_media_included'):
+                return forms.Media()
+        except AttributeError:
+            setattr(self.request, 'daterange_filter_media_included', True)
+
+            js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+            css = ['widgets.css']
+
+            return forms.Media(
+                js=[static("admin/js/%s" % path) for path in js],
+                css={'all': [static("admin/css/%s" % path) for path in css]}
+            )
+
+
+class DateRangeForm(DateRangeFilterBaseForm):
 
     def __init__(self, *args, **kwargs):
         field_name = kwargs.pop('field_name')
@@ -29,7 +55,7 @@ class DateRangeForm(forms.Form):
             required=False)
 
 
-class DateTimeRangeForm(forms.Form):
+class DateTimeRangeForm(DateRangeFilterBaseForm):
 
     def __init__(self, *args, **kwargs):
         field_name = kwargs.pop('field_name')
@@ -60,7 +86,7 @@ class DateRangeFilter(admin.filters.FieldListFilter):
         return [self.lookup_kwarg_since, self.lookup_kwarg_upto]
 
     def get_form(self, request):
-        return DateRangeForm(data=self.used_parameters,
+        return DateRangeForm(request, data=self.used_parameters,
                              field_name=self.field_path)
 
     def queryset(self, request, queryset):
@@ -90,7 +116,7 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
         return [self.lookup_kwarg_since, self.lookup_kwarg_upto]
 
     def get_form(self, request):
-        return DateTimeRangeForm(data=self.used_parameters,
+        return DateTimeRangeForm(request, data=self.used_parameters,
                                  field_name=self.field_path)
 
     def queryset(self, request, queryset):
