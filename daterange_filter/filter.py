@@ -49,15 +49,23 @@ class DateRangeForm(DateRangeFilterBaseForm):
         field_name = kwargs.pop('field_name')
         super(DateRangeForm, self).__init__(*args, **kwargs)
 
-        self.fields['%s__gte' % field_name] = forms.DateField(
-            label='', widget=AdminDateWidget(
-                attrs={'placeholder': _('From date')}), localize=True,
-            required=False)
+        self.fields['%s__gte' % self.field_name] = forms.DateField(
+            label='',
+            widget=AdminDateWidget(
+                attrs={'placeholder': _('From date')}
+            ),
+            localize=True,
+            required=False
+        )
 
         self.fields['%s__lte' % field_name] = forms.DateField(
-            label='', widget=AdminDateWidget(
-                attrs={'placeholder': _('To date')}), localize=True,
-            required=False)
+            label='',
+            widget=AdminDateWidget(
+                attrs={'placeholder': _('To date')}
+            ),
+            localize=True,
+            required=False,
+        )
 
 
 class DateTimeRangeForm(DateRangeFilterBaseForm):
@@ -65,13 +73,24 @@ class DateTimeRangeForm(DateRangeFilterBaseForm):
     def __init__(self, *args, **kwargs):
         field_name = kwargs.pop('field_name')
         super(DateTimeRangeForm, self).__init__(*args, **kwargs)
+
         self.fields['%s__gte' % field_name] = forms.DateTimeField(
-                                label='',
-                                widget=AdminSplitDateTime(
-                                    attrs={'placeholder': _('From Date')}
-                                ),
-                                localize=True,
-                                required=False)
+            label='',
+            widget=DateRangeFilterAdminSplitDateTime(
+                attrs={'placeholder': _('From date')}
+            ),
+            localize=True,
+            required=False
+        )
+
+        self.fields['%s__lte' % field_name] = forms.DateTimeField(
+            label='',
+            widget=DateRangeFilterAdminSplitDateTime(
+                attrs={'placeholder': _('To date')},
+            ),
+            localize=True,
+            required=False
+        )
 
 
 class DateRangeFilter(admin.filters.FieldListFilter):
