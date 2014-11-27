@@ -5,6 +5,7 @@
 Has the filter that allows to filter by a date range.
 
 '''
+import datetime
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
@@ -118,6 +119,12 @@ class DateRangeFilter(admin.filters.FieldListFilter):
             # get no null params
             filter_params = dict(filter(lambda x: bool(x[1]),
                                         self.form.cleaned_data.items()))
+
+            # filter by upto included
+            if filter_params.get(self.lookup_kwarg_upto) is not None:
+                lookup_kwarg_upto_value = filter_params.pop(self.lookup_kwarg_upto)
+                filter_params['%s__lt' % self.field_path] = lookup_kwarg_upto_value + datetime.timedelta(days=1)
+
             return queryset.filter(**filter_params)
         else:
             return queryset
