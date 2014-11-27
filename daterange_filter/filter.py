@@ -14,6 +14,11 @@ from django.utils.translation import ugettext as _
 from django.contrib.admin.templatetags.admin_static import static
 
 
+class DateRangeFilterAdminSplitDateTime(AdminSplitDateTime):
+    def format_output(self, rendered_widgets):
+        return format_html('<p>{0} {1}<br />{2} {3}</p>',
+                           '', rendered_widgets[0],
+                           '', rendered_widgets[1])
 
 
 class DateRangeFilterBaseForm(forms.Form):
