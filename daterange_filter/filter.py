@@ -50,7 +50,7 @@ class DateRangeForm(DateRangeFilterBaseForm):
         field_name = kwargs.pop('field_name')
         super(DateRangeForm, self).__init__(*args, **kwargs)
 
-        self.fields['%s__gte' % self.field_name] = forms.DateField(
+        self.fields['%s__gte' % field_name] = forms.DateField(
             label='',
             widget=AdminDateWidget(
                 attrs={'placeholder': _('From date')}
