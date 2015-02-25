@@ -63,6 +63,10 @@ formats for filtering.
 Changes 
 -------
 
+1.1.1:
+
+* Special thanks to: https://github.com/mightygraf
+
 0.2.0:
 
 * Updated README
