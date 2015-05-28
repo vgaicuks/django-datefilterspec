@@ -12,10 +12,21 @@ from django.db import models
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 from django.contrib.admin.templatetags.admin_static import static
+from django.conf import settings
 
-try:
-    from suit.widgets import SuitDateWidget as AdminDateWidget, SuitSplitDateTimeWidget as AdminSplitDateTime
-except ImportError:
+use_suit = 'DATE_RANGE_FILTER_USE_WIDGET_SUIT'
+
+if hasattr(settings, use_suit):
+    DATE_RANGE_FILTER_USE_WIDGET_SUIT = getattr(settings, use_suit)
+else:
+    DATE_RANGE_FILTER_USE_WIDGET_SUIT = False
+
+if DATE_RANGE_FILTER_USE_WIDGET_SUIT:
+    try:
+        from suit.widgets import SuitDateWidget as AdminDateWidget, SuitSplitDateTimeWidget as AdminSplitDateTime
+    except ImportError:
+        from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
+else:
     from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
 
 
