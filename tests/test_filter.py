@@ -1,26 +1,13 @@
 from datetime import datetime, date, timedelta
+
 from django.utils import timezone
 from mock import Mock, call, ANY, patch
-from unittest import TestCase
 from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
 from django.utils.translation import ugettext as _
 from daterange_filter.filter import DateRangeFilterBaseForm, DateRangeForm, DateTimeRangeForm, \
     DateRangeFilterAdminSplitDateTime, DateRangeFilter, DateTimeRangeFilter
-
-
-class BaseTest(TestCase):
-    if not hasattr(TestCase, 'assertItemsEqual'):
-        def assertItemsEqual(self, expected_seq, actual_seq, msg=None):
-            self.assertEqual(sorted(expected_seq), sorted(actual_seq), msg=msg)
-
-    if not hasattr(TestCase, 'assertIsInstance'):
-        def assertIsInstance(self, instance, klass, msg=None):
-            self.assertTrue(isinstance(instance, klass), msg=msg)
-
-    if not hasattr(TestCase, 'assertDictContainsSubset'):
-        def assertDictContainsSubset(self, needle, haystack, msg=None):
-            self.assertTrue(set(needle.items()).issubset(set(haystack.items())), msg=msg)
+from tests import BaseTest
 
 
 class DateRangeFilterBaseFormTest(BaseTest):
