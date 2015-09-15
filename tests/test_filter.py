@@ -9,7 +9,21 @@ from daterange_filter.filter import DateRangeFilterBaseForm, DateRangeForm, Date
     DateRangeFilterAdminSplitDateTime, DateRangeFilter, DateTimeRangeFilter
 
 
-class DateRangeFilterBaseFormTest(TestCase):
+class BaseTest(TestCase):
+    if not hasattr(TestCase, 'assertItemsEqual'):
+        def assertItemsEqual(self, expected_seq, actual_seq, msg=None):
+            self.assertEqual(sorted(expected_seq), sorted(actual_seq), msg=msg)
+
+    if not hasattr(TestCase, 'assertIsInstance'):
+        def assertIsInstance(self, instance, klass, msg=None):
+            self.assertTrue(isinstance(instance, klass), msg=msg)
+
+    if not hasattr(TestCase, 'assertDictContainsSubset'):
+        def assertDictContainsSubset(self, needle, haystack, msg=None):
+            self.assertTrue(set(needle.items()).issubset(set(haystack.items())), msg=msg)
+
+
+class DateRangeFilterBaseFormTest(BaseTest):
     def setUp(self):
         self.request = Mock()
 
@@ -17,7 +31,7 @@ class DateRangeFilterBaseFormTest(TestCase):
         del self.request.daterange_filter_media_included
         form = DateRangeFilterBaseForm(self.request)
 
-        self.assertEquals(str(form.media), str(forms.Media(
+        self.assertEqual(str(form.media), str(forms.Media(
             js=['admin/js/calendar.js', 'admin/js/admin/DateTimeShortcuts.js'],
             css={'all': ['admin/css/widgets.css']}
         )))
@@ -29,10 +43,10 @@ class DateRangeFilterBaseFormTest(TestCase):
         form_2 = DateRangeFilterBaseForm(self.request)
 
         self.assertNotEqual(str(form_1.media), '')
-        self.assertEquals(str(form_2.media), '')
+        self.assertEqual(str(form_2.media), '')
 
 
-class DateRangeFormTest(TestCase):
+class DateRangeFormTest(BaseTest):
     def test_create_fields(self):
         form = DateRangeForm(Mock(), field_name='spam')
 
@@ -42,22 +56,22 @@ class DateRangeFormTest(TestCase):
     def test_field_attributes(self):
         form = DateRangeForm(Mock(), field_name='ham')
 
-        self.assertEquals(form.fields['ham__gte'].label, '')
-        self.assertEquals(form.fields['ham__gte'].localize, True)
-        self.assertEquals(form.fields['ham__gte'].required, False)
+        self.assertEqual(form.fields['ham__gte'].label, '')
+        self.assertEqual(form.fields['ham__gte'].localize, True)
+        self.assertEqual(form.fields['ham__gte'].required, False)
         self.assertIsInstance(form.fields['ham__gte'].widget, AdminDateWidget)
         self.assertDictContainsSubset({'placeholder': _('From date')},
                                       form.fields['ham__gte'].widget.attrs)
 
-        self.assertEquals(form.fields['ham__lte'].label, '')
-        self.assertEquals(form.fields['ham__lte'].localize, True)
-        self.assertEquals(form.fields['ham__lte'].required, False)
+        self.assertEqual(form.fields['ham__lte'].label, '')
+        self.assertEqual(form.fields['ham__lte'].localize, True)
+        self.assertEqual(form.fields['ham__lte'].required, False)
         self.assertIsInstance(form.fields['ham__lte'].widget, AdminDateWidget)
         self.assertDictContainsSubset({'placeholder': _('To date')},
                                       form.fields['ham__lte'].widget.attrs)
 
 
-class DateTimeRangeFormTest(TestCase):
+class DateTimeRangeFormTest(BaseTest):
 
     class DummyForm(DateTimeRangeForm):
         pass
@@ -71,34 +85,34 @@ class DateTimeRangeFormTest(TestCase):
     def test_field_attributes(self):
         form = self.DummyForm(Mock(), field_name='ham')
 
-        self.assertEquals(form.fields['ham__gte'].label, '')
-        self.assertEquals(form.fields['ham__gte'].localize, True)
-        self.assertEquals(form.fields['ham__gte'].required, False)
+        self.assertEqual(form.fields['ham__gte'].label, '')
+        self.assertEqual(form.fields['ham__gte'].localize, True)
+        self.assertEqual(form.fields['ham__gte'].required, False)
         self.assertIsInstance(form.fields['ham__gte'].widget, DateRangeFilterAdminSplitDateTime)
         self.assertDictContainsSubset({'placeholder': _('From date')},
                                       form.fields['ham__gte'].widget.attrs)
 
-        self.assertEquals(form.fields['ham__lte'].label, '')
-        self.assertEquals(form.fields['ham__lte'].localize, True)
-        self.assertEquals(form.fields['ham__lte'].required, False)
+        self.assertEqual(form.fields['ham__lte'].label, '')
+        self.assertEqual(form.fields['ham__lte'].localize, True)
+        self.assertEqual(form.fields['ham__lte'].required, False)
         self.assertIsInstance(form.fields['ham__lte'].widget, DateRangeFilterAdminSplitDateTime)
         self.assertDictContainsSubset({'placeholder': _('To date')},
                                       form.fields['ham__lte'].widget.attrs)
 
 
-class DateRangeFilterTest(TestCase):
+class DateRangeFilterTest(BaseTest):
     def setUp(self):
         self.request = Mock()
         self.filter_ = DateRangeFilter('spam', self.request, [], Mock(), Mock(), 'egg')
 
     def test_use_correctly_template(self):
-        self.assertEquals(self.filter_.template, 'daterange_filter/filter.html')
+        self.assertEqual(self.filter_.template, 'daterange_filter/filter.html')
 
     def test_form_uses_request(self):
-        self.assertEquals(self.filter_.form.request, self.request)
+        self.assertEqual(self.filter_.form.request, self.request)
 
     def test_choices_is_empty(self):
-        self.assertEquals(self.filter_.choices(Mock()), [])
+        self.assertEqual(self.filter_.choices(Mock()), [])
 
     def test_expected_params(self):
         self.assertItemsEqual(self.filter_.expected_parameters(), ['egg__lte', 'egg__gte'])
@@ -107,7 +121,7 @@ class DateRangeFilterTest(TestCase):
     def test_get_form(self, DateRangeForm):
         self.filter_.get_form(self.request)
 
-        self.assertEquals([call(self.request, data=ANY, field_name='egg')],
+        self.assertEqual([call(self.request, data=ANY, field_name='egg')],
                           DateRangeForm.call_args_list)
 
     def test_queryset_ignore_null_fields(self):
@@ -117,7 +131,7 @@ class DateRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset.filter.return_value)
+        self.assertEqual(return_value, queryset.filter.return_value)
         self.assertItemsEqual([call()], queryset.filter.call_args_list)
 
     def test_queryset_filters_by_date_from(self):
@@ -127,7 +141,7 @@ class DateRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset.filter.return_value)
+        self.assertEqual(return_value, queryset.filter.return_value)
         self.assertItemsEqual([call(ham__gte=date(2014, 1, 3))], queryset.filter.call_args_list)
 
     def test_queryset_filters_by_date_to(self):
@@ -138,8 +152,8 @@ class DateRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset.filter.return_value)
-        self.assertEquals((data_end + timedelta(days=1)).strftime('%s'),
+        self.assertEqual(return_value, queryset.filter.return_value)
+        self.assertEqual((data_end + timedelta(days=1)).strftime('%s'),
                           queryset.filter.call_args_list[0][1]['ham__lt'].strftime('%s'))
 
     def test_return_raw_queryset_if_form_is_invalid(self):
@@ -149,23 +163,23 @@ class DateRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset)
+        self.assertEqual(return_value, queryset)
 
 
-class DateTimeRangeFilterTest(TestCase):
+class DateTimeRangeFilterTest(BaseTest):
     def setUp(self):
         self.request = Mock()
         self.filter_ = DateTimeRangeFilter('spam', self.request, {'egg__lte_0': None, 'egg__lte_1': None}, Mock(),
                                            Mock(), 'egg')
 
     def test_use_correctly_template(self):
-        self.assertEquals(self.filter_.template, 'daterange_filter/filter.html')
+        self.assertEqual(self.filter_.template, 'daterange_filter/filter.html')
 
     def test_form_uses_request(self):
-        self.assertEquals(self.filter_.form.request, self.request)
+        self.assertEqual(self.filter_.form.request, self.request)
 
     def test_choices_is_empty(self):
-        self.assertEquals(self.filter_.choices(Mock()), [])
+        self.assertEqual(self.filter_.choices(Mock()), [])
 
     def test_expected_params(self):
         self.assertItemsEqual(self.filter_.expected_parameters(), ['egg__lte_0', 'egg__lte_1', 'egg__gte_0', 'egg__gte_1'])
@@ -174,7 +188,7 @@ class DateTimeRangeFilterTest(TestCase):
     def test_get_form(self, DateTimeRangeForm):
         self.filter_.get_form(self.request)
 
-        self.assertEquals([call(self.request, data={'egg__lte_0': None, 'egg__lte_1': None}, field_name='egg')],
+        self.assertEqual([call(self.request, data={'egg__lte_0': None, 'egg__lte_1': None}, field_name='egg')],
                           DateTimeRangeForm.call_args_list)
 
     def test_queryset_ignore_null_fields(self):
@@ -184,7 +198,7 @@ class DateTimeRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset.filter.return_value)
+        self.assertEqual(return_value, queryset.filter.return_value)
         self.assertItemsEqual([call()], queryset.filter.call_args_list)
 
     def test_queryset_filters_by_date_from(self):
@@ -195,7 +209,7 @@ class DateTimeRangeFilterTest(TestCase):
         return_value = filter_.queryset(self.request, queryset)
         timezoned_expected_result = timezone.make_aware(datetime(2014, 1, 2, 3, 4, 5), timezone.get_current_timezone())
 
-        self.assertEquals(return_value, queryset.filter.return_value)
+        self.assertEqual(return_value, queryset.filter.return_value)
         self.assertItemsEqual([call(ham__gte=timezoned_expected_result)], queryset.filter.call_args_list)
 
     def test_queryset_filters_by_date_to(self):
@@ -207,8 +221,8 @@ class DateTimeRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset.filter.return_value)
-        self.assertEquals(data_end, queryset.filter.call_args_list[0][1]['ham__lte'])
+        self.assertEqual(return_value, queryset.filter.return_value)
+        self.assertEqual(data_end, queryset.filter.call_args_list[0][1]['ham__lte'])
 
     def test_return_raw_queryset_if_form_is_invalid(self):
         queryset = Mock()
@@ -217,4 +231,4 @@ class DateTimeRangeFilterTest(TestCase):
 
         return_value = filter_.queryset(self.request, queryset)
 
-        self.assertEquals(return_value, queryset)
+        self.assertEqual(return_value, queryset)

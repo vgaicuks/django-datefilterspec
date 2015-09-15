@@ -10,7 +10,6 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.admin.templatetags.admin_static import static
 
@@ -21,7 +20,7 @@ except ImportError:
 
     def format_html(format_string, *args, **kwargs):
         args_safe = map(conditional_escape, args)
-        kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.iteritems()}
+        kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in kwargs.items())
         return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -165,7 +164,7 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
     def queryset(self, request, queryset):
         if self.form.is_valid():
             # get no null params
-            filter_params = dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.iteritems()))
+            filter_params = dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.items()))
             return queryset.filter(**filter_params)
         else:
             return queryset
