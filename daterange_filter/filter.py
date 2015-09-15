@@ -10,10 +10,19 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
 from django.db import models
-from django.utils.html import format_html
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.admin.templatetags.admin_static import static
+
+try:
+    from django.utils.html import format_html
+except ImportError:
+    from django.utils.html import conditional_escape, mark_safe
+
+    def format_html(format_string, *args, **kwargs):
+        args_safe = map(conditional_escape, args)
+        kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.iteritems()}
+        return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
 class DateRangeFilterAdminSplitDateTime(AdminSplitDateTime):
