@@ -10,16 +10,12 @@ from daterange_filter.filter import DateRangeFilterBaseForm, DateRangeForm, Date
 
 
 class DateRangeFilterBaseFormTest(TestCase):
-
-    class DummyForm(DateRangeFilterBaseForm):
-        pass
-
     def setUp(self):
         self.request = Mock()
 
     def test_form_returns_all_media(self):
         del self.request.daterange_filter_media_included
-        form = self.DummyForm(self.request)
+        form = DateRangeFilterBaseForm(self.request)
 
         self.assertEquals(str(form.media), str(forms.Media(
             js=['admin/js/calendar.js', 'admin/js/admin/DateTimeShortcuts.js'],
@@ -29,26 +25,22 @@ class DateRangeFilterBaseFormTest(TestCase):
     def test_form_returns_empty_media_if_another_form_has_already_been_instantiated(self):
         del self.request.daterange_filter_media_included
 
-        form_1 = self.DummyForm(self.request)
-        form_2 = self.DummyForm(self.request)
+        form_1 = DateRangeFilterBaseForm(self.request)
+        form_2 = DateRangeFilterBaseForm(self.request)
 
         self.assertNotEqual(str(form_1.media), '')
         self.assertEquals(str(form_2.media), '')
 
 
 class DateRangeFormTest(TestCase):
-
-    class DummyForm(DateRangeForm):
-        pass
-
     def test_create_fields(self):
-        form = self.DummyForm(Mock(), field_name='spam')
+        form = DateRangeForm(Mock(), field_name='spam')
 
         self.assertIsInstance(form.fields['spam__gte'], forms.DateField)
         self.assertIsInstance(form.fields['spam__lte'], forms.DateField)
 
     def test_field_attributes(self):
-        form = self.DummyForm(Mock(), field_name='ham')
+        form = DateRangeForm(Mock(), field_name='ham')
 
         self.assertEquals(form.fields['ham__gte'].label, '')
         self.assertEquals(form.fields['ham__gte'].localize, True)
