@@ -59,6 +59,11 @@ edit the admin.ModelAdmin referenced to that class:
 DateRangeFilter honours localization and supports local date 
 formats for filtering.
 
+Running tests
+-------
+First :code:`pip install -r requirements.txt`, then :code:`python ./runtests.py`
+
+If you wanna run tests on all supported Python/Django versions, execute :code:`tox`.
 
 Changes 
 -------
