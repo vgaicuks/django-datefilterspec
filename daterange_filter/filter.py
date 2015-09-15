@@ -11,6 +11,7 @@ from django.contrib import admin
 from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
 from django.db import models
 from django.utils.html import format_html
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.admin.templatetags.admin_static import static
 
@@ -134,8 +135,11 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
     template = 'daterange_filter/filter.html'
 
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg_since = '%s__gte' % field_path
-        self.lookup_kwarg_upto = '%s__lte' % field_path
+        self.lookup_kwarg_since_0 = '%s__gte_0' % field_path
+        self.lookup_kwarg_since_1 = '%s__gte_1' % field_path
+        self.lookup_kwarg_upto_0 = '%s__lte_0' % field_path
+        self.lookup_kwarg_upto_1 = '%s__lte_1' % field_path
+
         super(DateTimeRangeFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
         self.form = self.get_form(request)
@@ -144,17 +148,15 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
         return []
 
     def expected_parameters(self):
-        return [self.lookup_kwarg_since, self.lookup_kwarg_upto]
+        return [self.lookup_kwarg_since_0, self.lookup_kwarg_since_1, self.lookup_kwarg_upto_0, self.lookup_kwarg_upto_1]
 
     def get_form(self, request):
-        return DateTimeRangeForm(request, data=self.used_parameters,
-                                 field_name=self.field_path)
+        return DateTimeRangeForm(request, data=self.used_parameters, field_name=self.field_path)
 
     def queryset(self, request, queryset):
         if self.form.is_valid():
             # get no null params
-            filter_params = dict(filter(lambda x: bool(x[1]),
-                                        self.form.cleaned_data.items()))
+            filter_params = dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.iteritems()))
             return queryset.filter(**filter_params)
         else:
             return queryset
