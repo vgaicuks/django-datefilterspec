@@ -3,7 +3,18 @@
 import os
 import sys
 import pytest
+from django.conf import settings
 
+
+settings.configure(USE_TZ=True)
+
+try:
+    import django
+    setup = django.setup
+except AttributeError:
+    pass
+else:
+    setup()
 
 os.environ['test'] = '1'
 

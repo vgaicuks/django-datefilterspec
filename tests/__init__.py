@@ -1,16 +1,4 @@
 from unittest import TestCase
-from django.conf import settings
-
-
-settings.configure(USE_TZ=True)
-
-try:
-    import django
-    setup = django.setup
-except AttributeError:
-    pass
-else:
-    setup()
 
 
 class BaseTest(TestCase):
