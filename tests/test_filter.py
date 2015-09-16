@@ -57,6 +57,18 @@ class DateRangeFormTest(BaseTest):
         self.assertDictContainsSubset({'placeholder': _('To date')},
                                       form.fields['ham__lte'].widget.attrs)
 
+    def test_returns_all_media(self):
+        request = Mock()
+        del request.daterange_filter_media_included
+        form_1 = DateRangeForm(request, field_name='spam')
+        form_2 = DateRangeForm(request, field_name='ham')
+
+        self.assertEqual(str(form_1.media), str(forms.Media(
+            js=['admin/js/calendar.js', 'admin/js/admin/DateTimeShortcuts.js'],
+            css={'all': ['admin/css/widgets.css']}
+        )))
+        self.assertEquals(str(form_2.media), '')
+
 
 class DateTimeRangeFormTest(BaseTest):
 
@@ -85,6 +97,18 @@ class DateTimeRangeFormTest(BaseTest):
         self.assertIsInstance(form.fields['ham__lte'].widget, DateRangeFilterAdminSplitDateTime)
         self.assertDictContainsSubset({'placeholder': _('To date')},
                                       form.fields['ham__lte'].widget.attrs)
+
+    def test_returns_all_media(self):
+        request = Mock()
+        del request.daterange_filter_media_included
+        form_1 = DateTimeRangeForm(request, field_name='spam')
+        form_2 = DateTimeRangeForm(request, field_name='ham')
+
+        self.assertEqual(str(form_1.media), str(forms.Media(
+            js=['admin/js/calendar.js', 'admin/js/admin/DateTimeShortcuts.js'],
+            css={'all': ['admin/css/widgets.css']}
+        )))
+        self.assertEquals(str(form_2.media), '')
 
 
 class DateRangeFilterTest(BaseTest):

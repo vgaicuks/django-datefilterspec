@@ -6,6 +6,7 @@ Has the filter that allows to filter by a date range.
 
 '''
 import datetime
+import django
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import AdminDateWidget, AdminSplitDateTime
@@ -77,6 +78,12 @@ class DateRangeForm(DateRangeFilterBaseForm):
             required=False,
         )
 
+    # Django 1.4 can't handle media inheritance well. We have to do it manually.
+    if django.VERSION < (1, 5):
+        @property
+        def media(self):
+            return super(DateRangeForm, self).media
+
 
 class DateTimeRangeForm(DateRangeFilterBaseForm):
 
@@ -101,6 +108,12 @@ class DateTimeRangeForm(DateRangeFilterBaseForm):
             localize=True,
             required=False
         )
+
+    # Django 1.4 can't handle media inheritance well. We have to do it manually.
+    if django.VERSION < (1, 5):
+        @property
+        def media(self):
+            return super(DateTimeRangeForm, self).media
 
 
 class DateRangeFilter(admin.filters.FieldListFilter):
