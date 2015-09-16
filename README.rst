@@ -1,4 +1,8 @@
-django-daterange-filter 
+.. image:: https://travis-ci.org/tzulberti/django-datefilterspec.svg?branch=master
+    :alt: Build status
+    :target: https://travis-ci.org/tzulberti/django-datefilterspec
+
+django-daterange-filter
 =======================
 
 Add the option to filter by a custom date range on the admin. This allows
