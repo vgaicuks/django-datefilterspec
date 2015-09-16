@@ -25,6 +25,15 @@ except ImportError:
         return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
+# Django doesn't deal well with filter params that look like queryset lookups.
+FILTER_PREFIX = 'drf__'
+
+
+def clean_input_prefix(input_):
+    return dict((key.split(FILTER_PREFIX)[1] if key.startswith(FILTER_PREFIX) else key, val)
+                for (key, val) in input_.items())
+
+
 class DateRangeFilterAdminSplitDateTime(AdminSplitDateTime):
     def format_output(self, rendered_widgets):
         return format_html('<p>{0} {1}<br />{2} {3}</p>',
@@ -60,7 +69,7 @@ class DateRangeForm(DateRangeFilterBaseForm):
         field_name = kwargs.pop('field_name')
         super(DateRangeForm, self).__init__(*args, **kwargs)
 
-        self.fields['%s__gte' % field_name] = forms.DateField(
+        self.fields['%s%s__gte' % (FILTER_PREFIX, field_name)] = forms.DateField(
             label='',
             widget=AdminDateWidget(
                 attrs={'placeholder': _('From date')}
@@ -69,7 +78,7 @@ class DateRangeForm(DateRangeFilterBaseForm):
             required=False
         )
 
-        self.fields['%s__lte' % field_name] = forms.DateField(
+        self.fields['%s%s__lte' % (FILTER_PREFIX, field_name)] = forms.DateField(
             label='',
             widget=AdminDateWidget(
                 attrs={'placeholder': _('To date')}
@@ -91,7 +100,7 @@ class DateTimeRangeForm(DateRangeFilterBaseForm):
         field_name = kwargs.pop('field_name')
         super(DateTimeRangeForm, self).__init__(*args, **kwargs)
 
-        self.fields['%s__gte' % field_name] = forms.DateTimeField(
+        self.fields['%s%s__gte' % (FILTER_PREFIX, field_name)] = forms.DateTimeField(
             label='',
             widget=DateRangeFilterAdminSplitDateTime(
                 attrs={'placeholder': _('From date')}
@@ -100,7 +109,7 @@ class DateTimeRangeForm(DateRangeFilterBaseForm):
             required=False
         )
 
-        self.fields['%s__lte' % field_name] = forms.DateTimeField(
+        self.fields['%s%s__lte' % (FILTER_PREFIX, field_name)] = forms.DateTimeField(
             label='',
             widget=DateRangeFilterAdminSplitDateTime(
                 attrs={'placeholder': _('To date')},
@@ -120,8 +129,8 @@ class DateRangeFilter(admin.filters.FieldListFilter):
     template = 'daterange_filter/filter.html'
 
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg_since = '%s__gte' % field_path
-        self.lookup_kwarg_upto = '%s__lte' % field_path
+        self.lookup_kwarg_since = '%s%s__gte' % (FILTER_PREFIX, field_path)
+        self.lookup_kwarg_upto = '%s%s__lte' % (FILTER_PREFIX, field_path)
         super(DateRangeFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
         self.form = self.get_form(request)
@@ -139,12 +148,12 @@ class DateRangeFilter(admin.filters.FieldListFilter):
     def queryset(self, request, queryset):
         if self.form.is_valid():
             # get no null params
-            filter_params = dict(filter(lambda x: bool(x[1]),
-                                        self.form.cleaned_data.items()))
+            filter_params = clean_input_prefix(dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.items())))
 
             # filter by upto included
-            if filter_params.get(self.lookup_kwarg_upto) is not None:
-                lookup_kwarg_upto_value = filter_params.pop(self.lookup_kwarg_upto)
+            lookup_upto = self.lookup_kwarg_upto.lstrip(FILTER_PREFIX)
+            if filter_params.get(lookup_upto) is not None:
+                lookup_kwarg_upto_value = filter_params.pop(lookup_upto)
                 filter_params['%s__lt' % self.field_path] = lookup_kwarg_upto_value + datetime.timedelta(days=1)
 
             return queryset.filter(**filter_params)
@@ -156,10 +165,10 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
     template = 'daterange_filter/filter.html'
 
     def __init__(self, field, request, params, model, model_admin, field_path):
-        self.lookup_kwarg_since_0 = '%s__gte_0' % field_path
-        self.lookup_kwarg_since_1 = '%s__gte_1' % field_path
-        self.lookup_kwarg_upto_0 = '%s__lte_0' % field_path
-        self.lookup_kwarg_upto_1 = '%s__lte_1' % field_path
+        self.lookup_kwarg_since_0 = '%s%s__gte_0' % (FILTER_PREFIX, field_path)
+        self.lookup_kwarg_since_1 = '%s%s__gte_1' % (FILTER_PREFIX, field_path)
+        self.lookup_kwarg_upto_0 = '%s%s__lte_0' % (FILTER_PREFIX, field_path)
+        self.lookup_kwarg_upto_1 = '%s%s__lte_1' % (FILTER_PREFIX, field_path)
 
         super(DateTimeRangeFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
@@ -177,7 +186,7 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
     def queryset(self, request, queryset):
         if self.form.is_valid():
             # get no null params
-            filter_params = dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.items()))
+            filter_params = clean_input_prefix(dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.items())))
             return queryset.filter(**filter_params)
         else:
             return queryset
