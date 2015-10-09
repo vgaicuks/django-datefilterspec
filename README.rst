@@ -1,4 +1,8 @@
-django-daterange-filter 
+.. image:: https://travis-ci.org/tzulberti/django-datefilterspec.svg?branch=master
+    :alt: Build status
+    :target: https://travis-ci.org/tzulberti/django-datefilterspec
+
+django-daterange-filter
 =======================
 
 Add the option to filter by a custom date range on the admin. This allows
@@ -59,6 +63,11 @@ edit the admin.ModelAdmin referenced to that class:
 DateRangeFilter honours localization and supports local date 
 formats for filtering.
 
+Running tests
+-------
+First :code:`pip install -r requirements.txt`, then :code:`python ./runtests.py`
+
+If you wanna run tests on all supported Python/Django versions, execute :code:`tox`.
 
 Changes 
 -------

@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 
+
 setup(
     name='django-daterange-filter',
     version='1.1.1',
@@ -15,7 +16,7 @@ setup(
     install_requires=[
         "Django",
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
     classifiers = [
