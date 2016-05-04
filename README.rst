@@ -72,6 +72,11 @@ If you wanna run tests on all supported Python/Django versions, execute :code:`t
 Changes 
 -------
 
+1.3.0:
+
+* Fixed calendar icon moving to a new line in Django 1.9 (Special thanks to https://github.com/farooqaaa)
+* fix daterange_filter function (Special thanks to https://github.com/ZamorakLin)
+
 1.1.1:
 
 * Special thanks to: https://github.com/mightygraf
