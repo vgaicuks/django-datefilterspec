@@ -1,3 +1,10 @@
+ABANDONED
+=========
+
+Check this PR to get more info: https://github.com/tzulberti/django-datefilterspec/pull/17
+
+
+
 .. image:: https://travis-ci.org/tzulberti/django-datefilterspec.svg?branch=master
     :alt: Build status
     :target: https://travis-ci.org/tzulberti/django-datefilterspec
