@@ -211,6 +211,11 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
         return DateTimeRangeForm(request, data=self.used_parameters, field_name=self.field_path)
 
     def queryset(self, request, queryset):
+        if not self.form.data:
+            # not display errors when page is loaded for the first time
+            for key in self.form.errors:
+                self.form.errors[key] = ''
+
         if self.form.is_valid():
             # get no null params
             filter_params = clean_input_prefix(dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.items())))
