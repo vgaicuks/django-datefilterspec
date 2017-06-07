@@ -23,6 +23,18 @@
         display: inline;
     }
 </style>
+
+<script>
+    // reset button after submitting dates does not work, so 
+    // here is the solution which implements the fix.
+    django.jQuery(document).ready(function(){
+        django.jQuery("#resetBtn").click(function(){
+            var gte = django.jQuery("input[id^=id_drf__][id$=gte]")[0].defaultValue = "";
+            var lte = django.jQuery("input[id^=id_drf__][id$=lte]")[0].defaultValue = "";
+        });
+    });
+</script>
+
 {% with choices.0 as i %}
 <form method="GET" action="">
     {{ spec.form.media }}
@@ -33,7 +45,7 @@
                 <input type="hidden" name="{{ k }}" value="{{ v }}">
         {% endfor %}    
     <input type="submit" value="{% trans "Search" %}">
-    <input type="reset" value="{% trans "Clear" %}">
+    <input type="reset" id="resetBtn" value="{% trans "Clear" %}">
     </p>
 </form>
 {% endwith %}
