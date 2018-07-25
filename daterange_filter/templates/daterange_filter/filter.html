@@ -3,7 +3,7 @@
 <style>
     .calendarbox, .clockbox {
         /* Make sure the calendar widget popover displays in front of the sidebar */
-        z-index: 1100;
+        z-index: 9999;
         margin-left: -16em !important;
         margin-top: 9em !important;
     }
@@ -25,7 +25,7 @@
 </style>
 
 <script>
-    // reset button after submitting dates does not work, so 
+    // reset button after submitting dates does not work, so
     // here is the solution which implements the fix.
     django.jQuery(document).ready(function(){
         django.jQuery("#resetBtn").click(function(){
@@ -43,7 +43,7 @@
         {#create hidden inputs to preserve values from other filters and search field#}
         {% for k, v in i.get_query.items %}
                 <input type="hidden" name="{{ k }}" value="{{ v }}">
-        {% endfor %}    
+        {% endfor %}
     <input type="submit" value="{% trans "Search" %}">
     <input type="reset" id="resetBtn" value="{% trans "Clear" %}">
     </p>

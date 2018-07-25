@@ -8,7 +8,6 @@ Has the filter that allows to filter by a date range.
 import copy
 import datetime
 import django
-from django.db.models.query_utils import Q
 from django import forms
 from django.contrib import admin
 from django.db import models
@@ -181,7 +180,7 @@ class DateRangeFilter(admin.filters.FieldListFilter):
             if filter_params.get(lookup_upto) is not None:
                 lookup_kwarg_upto_value = filter_params.pop(lookup_upto)
                 filter_params['%s__lt' % self.field_path] = lookup_kwarg_upto_value + datetime.timedelta(days=1)
-            return Q(**filter_params)
+            return queryset.filter(**filter_params)
         else:
             return queryset
 
