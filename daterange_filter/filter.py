@@ -176,7 +176,7 @@ class DateRangeFilter(admin.filters.FieldListFilter):
             filter_params = clean_input_prefix(dict(filter(lambda x: bool(x[1]), self.form.cleaned_data.items())))
 
             # filter by upto included
-            lookup_upto = self.lookup_kwarg_upto.lstrip(FILTER_PREFIX)
+            lookup_upto = self.lookup_kwarg_upto.replace(FILTER_PREFIX, '')
             if filter_params.get(lookup_upto) is not None:
                 lookup_kwarg_upto_value = filter_params.pop(lookup_upto)
                 filter_params['%s__lt' % self.field_path] = lookup_kwarg_upto_value + datetime.timedelta(days=1)
